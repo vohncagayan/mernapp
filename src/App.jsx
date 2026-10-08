@@ -1,87 +1,56 @@
 import { useEffect, useState } from "react";
 import axios from "axios"
- 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 function App() {
- 
-  const [students, setStudents] = useState([]);
- 
-  const [name, setName] = useState("");
-   const [course, setCourse] = useState("");
-     const [age, setAge] = useState("");
- 
-  const [editingid, setEditingid] = useState(null);
- 
-     const editStudent =(student) =>{
-      setEditingid(student._id);
-      setName(student.name);
-      setCourse(student.course);
-      setAge(student.age);
- 
-     }
- 
-      const updateStudent= () => {
+
+  const updateStudent = () => {
     axios
-    .put(`http://localhost:5000/students/${editingid}`,{
-    name:name,
-      course:course,
-      age:age,
- 
-    })
-    .then(() => {
-      axios
-      .get("http://localhost:5000/students")
-      .then((response) =>{
-      setStudents(response.data);
- 
-     });
-     setEditingid(null);
-      setName("");
-      setCourse("");
-      setAge("");
- 
-    });
-  }
-   
- 
-  useEffect(() =>{
- 
-    axios
-    .get("http://localhost:5000/students")
-    .then((response) =>{
+      .put(`${API_URL}/api/students/${editingid}`, {
+        name: name,
+        course: course,
+        age: age,
+      })
+      .then(() => {
+        axios.get(`${API_URL}/api/students`).then((response) => {
+          setStudents(response.data);
+        });
+        setEditingid(null);
+        setName("");
+        setCourse("");
+        setAge("");
+      });
+  };
+
+  useEffect(() => {
+    axios.get(`${API_URL}/api/students`).then((response) => {
       setStudents(response.data);
     });
- 
   }, []);
- 
+
   const addStudent = () => {
     axios
-    .post("http://localhost:5000/students",{
-      name:name,
-      course:course,
-      age:age,
- 
-    })
-    .then((response)=>{
-      setStudents([...students, response.data]);
-      setName("");
-      setCourse("");
-      setAge("");
-    })
-  }
- 
+      .post(`${API_URL}/api/students`, {
+        name: name,
+        course: course,
+        age: age,
+      })
+      .then((response) => {
+        setStudents([...students, response.data]);
+        setName("");
+        setCourse("");
+        setAge("");
+      });
+  };
+
   const deleteStudent = (id) => {
-    axios
-    .delete(`http://localhost:5000/students/${id}`)
-    .then(() => {
-      axios
-      .get("http://localhost:5000/students")
-      .then((response) =>{
-      setStudents(response.data);
- 
-     })
-    })
-   
-  }
+    axios.delete(`${API_URL}/api/students/${id}`).then(() => {
+      axios.get(`${API_URL}/api/students`).then((response) => {
+        setStudents(response.data);
+      });
+    });
+  };
+}
  
  
   return(
@@ -120,6 +89,5 @@ function App() {
  
     </div>
   )
-}
  
 export default App;
